@@ -1,9 +1,16 @@
+import pandas as pd
 import pygame
 from pygame.draw import *
 from random import randint
+
+print("What's your name?")
+player_name = input()
+records = pd.read_csv('records.csv', sep=";")
+
 pygame.init()
 
 screen = pygame.display.set_mode((1200, 800))
+
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -95,6 +102,7 @@ while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
+                records = records.append({"Player": player_name, "Score": score_counter}, ignore_index=True)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if if_score(x, y, r):
                     score_counter += 1
@@ -108,3 +116,6 @@ while not finished:
         screen.fill(BLACK)
 
 pygame.quit()
+records.groupby(["Player"]).agg({"Score": "sum"})
+records.groupby(["Player"]).agg({"Score": "max"})
+records.to_csv('records.csv', index=False)

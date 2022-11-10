@@ -31,38 +31,57 @@ color = []
 
 
 def new_ball():
-    """creates n different balls"""
-    global x, y, r, n, vx, vy, color
-    n = randint(0, 5)
-    # x, y, r arrays will save the position of each ball
+    global x, y, r, color, vx, vy
+    """
+    Создаёт n различных шаров
+    x1, y1 -- координаты центра конкретного шара
+    r1 -- радиус конкретного шара
+    x, y -- массивы содержащие набор координат x1, y1 для наших n шариков
+    r -- массив содержащий радиусы каждого шара
+    vx1, vx2 -- проекции скорости конкретного шара на соответствующие оси
+    vx, vy -- массивы содержащие наборы vx1, vx2 для наших шаров
+    color1 -- цвет конкретного шара
+    color -- набор цветов шаров
+    """
+    x1 = randint(100, 1100)
+    y1 = randint(100, 700)
+    r1 = randint(10, 100)
+    vx1 = randint(-10, 10)
+    vy1 = randint(-10, 10)
+    color1 = COLORS[randint(0, 5)]
+    x += [x1]
+    y += [y1]
+    r += [r1]
+    vx += [vx1]
+    vy += [vy1]
+    color += [color1]
+
+
+def create_balls():
+    global n, x, y, r, color, vx, vy
+    """
+    Очищает массивы
+    Создает n шаров
+    """
     x = []
     y = []
     r = []
-    # vx, vy arrays will save its velocities
     vx = []
     vy = []
     color = []
-    for j in range(n):
-        # x1, y1, r1, color are position, radius and color of a current ball
-        x1 = randint(100, 1100)
-        y1 = randint(100, 700)
-        r1 = randint(10, 100)
-        vx1 = randint(-10, 10)
-        vy1 = randint(-10, 10)
-        color1 = COLORS[randint(0, 5)]
-        x += [x1]
-        y += [y1]
-        r += [r1]
-        vx += [vx1]
-        vy += [vy1]
-        color += [color1]
+    n = randint(0, 5)
+    for u in range(n):
+        new_ball()
+        circle(screen, color[u], (x[u], y[u]), r[u])
 
 
-def motion():
-    """Gives our balls a motion"""
-    global x, y, vx, vy, r, color
+def mote_balls():
+    global x, y, vx, vy, r, n, color
+    """
+    Проверяет врезался ли шар в стенку
+    Смещает все шары
+    """
     for g in range(n):
-        # Checks if they crashed into a wall
         if x[g] + r[g] >= 1200:
             vx[g] = randint(-10, 0)
             vy[g] = randint(-10, 10)
@@ -75,14 +94,22 @@ def motion():
         if y[g] - r[g] <= 0:
             vx[g] = randint(-10, 10)
             vy[g] = randint(-0, 10)
-        # motion
         x[g] += vx[g]
         y[g] += vy[g]
         circle(screen, (color[g]), (x[g], y[g]), r[g])
 
 
+def mote_all():
+    """
+    Вызываем функции движения для различных фигур (на случай если будут квадраты, треугольники и тд)
+    """
+    mote_balls()
+
+
 def if_score(p, q, k):
-    """shows us did we touch a ball or not"""
+    """
+    Регистрирует наше касание по фигуре
+    """
     (a, b) = event.pos
     for m in range(n):
         if (a - p[m]) ** 2 + (b - q[m]) ** 2 <= k[m] ** 2:
@@ -97,7 +124,7 @@ score_counter = 0
 
 while not finished:
     clock.tick(30)
-    new_ball()
+    create_balls()
     for i in range(20):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -108,7 +135,7 @@ while not finished:
                     score_counter += 1
 
         clock.tick(30)
-        motion()
+        mote_all()
         fild = pygame.font.Font(None, 48)
         text = fild.render("Score: " + str(score_counter), True, (255, 0, 0))
         screen.blit(text, (50, 50))
